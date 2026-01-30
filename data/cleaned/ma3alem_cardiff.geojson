@@ -1,0 +1,67 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-3.1835, 51.4849],
+          [-3.1760, 51.4849],
+          [-3.1760, 51.4885],
+          [-3.1835, 51.4885],
+          [-3.1835, 51.4849]
+        ]]
+      },
+      "properties": {
+        "Name": "Cardiff Castle",
+        "Category": "Historic Landmark",
+        "Story": "Cardiff Castle represents over 2,000 years of history, evolving from a Roman fort to a Norman stronghold and later a Victorian symbol of power.",
+        "TriggerType": "enter_area"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.1786053, 51.4891686]
+      },
+      "properties": {
+        "Name": "Abacws Building",
+        "Category": "Modern Landmark",
+        "Story": "Abacws is the home of Computer Science at Cardiff University and the location of the hackathon demonstration.",
+        "TriggerType": "enter_radius",
+        "RadiusMeters": 50
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.165581464767456, 51.48398971557617]
+      },
+      "properties": {
+        "Name": "Admiral House",
+        "Category": "Test Location",
+        "Story": "Personal test location used to validate proximity-based notification accuracy.",
+        "TriggerType": "enter_radius",
+        "RadiusMeters": 30
+      }
+    },
+    {
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-3.170523, 51.484322]
+  },
+  "properties": {
+    "Name": "Trevithick Library",
+    "Category": "Library",
+    "Story": "Trevithick Library is one of Cardiff University’s key academic libraries, supporting engineering, technology, and innovation research.",
+    "TriggerType": "enter_radius",
+    "RadiusMeters": 120
+  }
+}
+
+  ]
+}
