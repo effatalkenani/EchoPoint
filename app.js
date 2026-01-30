@@ -13,7 +13,6 @@ let userMarker = null;
 let userCircle = null;
 let settingsOpen = false;
 let activePlace = null;
-let firstLocationCheck = true;
 
 let locationRequested = false;
 /* ================== GEOJSON PLACES ================== */
@@ -31,13 +30,13 @@ const state = {
 /* ================== LANGUAGES ================== */
 const LANGS = [
   {code:"en",native:"English",dir:"ltr"},
-  {code:"ar",native:"العربية",dir:"rtl"},
+  {code:"ar",native:"العربية",dir:"rtl"}
 ];
 
 /* ================== UI TEXT ================== */
 const UI = {
   en:{
-    title:"EchPoint — Adaptive Audio Guide",
+    title:"Ma’alem — Adaptive Audio Guide",
     subtitle:"Language-first, location-aware audio experience",
     st1:"Step 1: Language",
     st2:"Step 2: Duration",
@@ -167,25 +166,6 @@ function distance(a,b,c,d){
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
 
-
-function getNarrationText(place){
-  if(state.duration === "short"){
-    return state.lang === "ar"
-      ? `أنتِ الآن عند ${place.name}.`
-      : `You are now at ${place.name}.`;
-  }
-
-  if(state.duration === "long"){
-    return state.lang === "ar"
-      ? place.story.ar_long
-      : place.story.en_long;
-  }
-
-  return "";
-}
-
-
-
 /* ================== UI ================== */
 function updateUI(){
   const pack = UI[state.lang];
@@ -291,38 +271,38 @@ function selectDuration(value){
 
 /* ================== LOAD GEOJSON ================== */
 function loadPlacesFromGeoJSON(){
-  return fetch("ma3alem_cardiff.geojson")
+  return fetch("data/cleaned/ma3alem_cardiff.geojson")
     .then(res => res.json())
     .then(data => {
       geoPlaces = data.features.map(f => {
         const g = f.geometry;
         const p = f.properties;
 
-        // 📍 Point
+        // 📍 نقطة (مثل Abacws / Admiral House)
         if(g.type === "Point"){
           return {
             name: p.Name,
             lat: g.coordinates[1],
             lng: g.coordinates[0],
             story: {
-              ar_long: p.Story.ar_long,
-              en_long: p.Story.en_long
+              ar: p.Story,
+              en: p.Story
             },
             trigger: p.TriggerType,
             radius: p.RadiusMeters || 120
           };
         }
 
-        // 🏰 Polygon
+        // 🏰 منطقة (مثل قلعة كارديف)
         if(g.type === "Polygon"){
-          const center = g.coordinates[0][0];
+          const center = g.coordinates[0][0]; // نقطة تقريبية للوسط
           return {
             name: p.Name,
             lat: center[1],
             lng: center[0],
             story: {
-              ar_long: p.Story.ar_long,
-              en_long: p.Story.en_long
+              ar: p.Story,
+              en: p.Story
             },
             trigger: "enter_area"
           };
@@ -330,7 +310,6 @@ function loadPlacesFromGeoJSON(){
       });
     });
 }
-
 
 /* ================== MAP ================== */
 function initMap(){
@@ -438,26 +417,18 @@ function activatePlace(nameEn){
 
 
 
+
 function activateGeoPlace(place){
-
-  // ✅ امنعي تكرار نفس المكان
-  if (activePlace === place.name) return;
-  activePlace = place.name;
-
   Object.values(markers).forEach(m => m.setIcon(redIcon()));
   markers[place.name]?.setIcon(greenIcon());
 
-  // 🔔 chime (اعيدي من البداية)
-  chime.currentTime = 0;
-  chime.play().catch(()=>{});
-
-  setTimeout(() => {
-    const narration = getNarrationText(place);
-    speak(narration, place.name);
-  }, 500);
+  // 🔔 صوت تنبيه
+  chime.play().then(() => {
+    setTimeout(() => {
+      speak(place.story[state.lang], place.name);
+    }, 500);
+  });
 }
-
-
 
 
 
@@ -480,9 +451,6 @@ function showSystemNotification(title, body) {
 function checkNearbyPlaces() {
   if (!state.coords || geoPlaces.length === 0) return;
 
-  // 👈 مهم للاختبار
-  if (DEMO_MODE) firstLocationCheck = true;
-
   geoPlaces.forEach(p => {
     const d = distance(
       state.coords.latitude,
@@ -498,28 +466,16 @@ function checkNearbyPlaces() {
       placeStates[p.name] = { inside: false };
     }
 
-    // ✅ الحالة الخاصة: أول تشغيل + أنتِ داخل المكان
-    if (firstLocationCheck && d <= radius) {
-      placeStates[p.name].inside = true;
-
-      activateGeoPlace(p);
-      showInAppNotification(p, d);
-
-      const message =
-        state.lang === "ar"
-          ? `أنتِ الآن عند ${p.name}`
-          : `You are now at ${p.name}`;
-
-      showSystemNotification("📍 معالم", message);
-    }
-
-    // 🔔 دخول طبيعي (بعدها)
+    // 🔔 دخول المكان لأول مرة
     if (d <= radius && !placeStates[p.name].inside) {
       placeStates[p.name].inside = true;
 
       activateGeoPlace(p);
+
+      // Toast داخل التطبيق
       showInAppNotification(p, d);
 
+      // إشعار نظامي
       const message =
         state.lang === "ar"
           ? `أنتِ الآن عند ${p.name}`
@@ -528,14 +484,11 @@ function checkNearbyPlaces() {
       showSystemNotification("📍 معالم", message);
     }
 
-    // خروج من المكان
-    if (d > radius) {
+    // الخروج من المكان
+   if (d > radius) {
       placeStates[p.name].inside = false;
     }
   });
-
-  // ❗ بعد أول فحص
-  firstLocationCheck = false;
 }
 
 
