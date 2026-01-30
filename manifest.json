@@ -1,7 +1,7 @@
 {
-  "name": "Ma’alem – Adaptive Audio Guide",
-  "short_name": "Ma’alem",
-  "start_url": "/Index.html",
+  "name": "EchoPoint - Adaptive Audio Guide",
+  "short_name": "EchoPoint",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
