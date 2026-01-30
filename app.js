@@ -115,10 +115,15 @@ let currentPlace = null;
 function speak(text, title = ""){
   const textBox = document.getElementById("playerText");
 
-  // ✅ إذا فيه كلام شغال: ألغيه وكمل تشغيل الجديد (لا تسوي return)
-  if (speechSynthesis.speaking || speechSynthesis.pending) {
+  // إذا فيه صوت شغال → أوقفيه
+  if(currentUtterance){
     speechSynthesis.cancel();
     currentUtterance = null;
+
+    document.getElementById("playerSub").textContent = "متوقف";
+    textBox.classList.add("hidden");
+    textBox.textContent = "";
+    return;
   }
 
   const u = new SpeechSynthesisUtterance(text);
@@ -127,6 +132,7 @@ function speak(text, title = ""){
   document.getElementById("playerTitle").textContent = title;
   document.getElementById("playerSub").textContent = "تشغيل";
 
+  // 👇 عرض النص
   textBox.textContent = text;
   textBox.classList.remove("hidden");
 
@@ -146,7 +152,6 @@ function speak(text, title = ""){
   currentUtterance = u;
   speechSynthesis.speak(u);
 }
-
 
 
 
@@ -433,34 +438,24 @@ function activatePlace(nameEn){
 
 
 
-
 function activateGeoPlace(place){
 
-  // 🛑 امنعي إعادة التفعيل لنفس المكان
+  // ✅ امنعي تكرار نفس المكان
   if (activePlace === place.name) return;
-
   activePlace = place.name;
 
-  // 🎯 تحديث الأيقونات
   Object.values(markers).forEach(m => m.setIcon(redIcon()));
   markers[place.name]?.setIcon(greenIcon());
 
-  // 🔔 تشغيل التنبيه مرة واحدة
-  try {
-    chime.pause();
-    chime.currentTime = 0;
-    chime.play();
-  } catch (e) {}
+  // 🔔 chime (اعيدي من البداية)
+  chime.currentTime = 0;
+  chime.play().catch(()=>{});
 
-  // 🗣️ تشغيل السرد الصوتي
   setTimeout(() => {
     const narration = getNarrationText(place);
-    if (narration) {
-      speak(narration, place.name);
-    }
+    speak(narration, place.name);
   }, 500);
 }
-
 
 
 
@@ -485,6 +480,9 @@ function showSystemNotification(title, body) {
 function checkNearbyPlaces() {
   if (!state.coords || geoPlaces.length === 0) return;
 
+  // 👈 مهم للاختبار
+  if (DEMO_MODE) firstLocationCheck = true;
+
   geoPlaces.forEach(p => {
     const d = distance(
       state.coords.latitude,
@@ -495,12 +493,27 @@ function checkNearbyPlaces() {
 
     const radius = p.radius || 120;
 
-    // تهيئة الحالة لأول مرة
+    // تهيئة الحالة
     if (!placeStates[p.name]) {
       placeStates[p.name] = { inside: false };
     }
 
-    // ✅ دخول المكان (مرة واحدة فقط)
+    // ✅ الحالة الخاصة: أول تشغيل + أنتِ داخل المكان
+    if (firstLocationCheck && d <= radius) {
+      placeStates[p.name].inside = true;
+
+      activateGeoPlace(p);
+      showInAppNotification(p, d);
+
+      const message =
+        state.lang === "ar"
+          ? `أنتِ الآن عند ${p.name}`
+          : `You are now at ${p.name}`;
+
+      showSystemNotification("📍 معالم", message);
+    }
+
+    // 🔔 دخول طبيعي (بعدها)
     if (d <= radius && !placeStates[p.name].inside) {
       placeStates[p.name].inside = true;
 
@@ -515,13 +528,15 @@ function checkNearbyPlaces() {
       showSystemNotification("📍 معالم", message);
     }
 
-    // 🚪 خروج من المكان
-    if (d > radius && placeStates[p.name].inside) {
+    // خروج من المكان
+    if (d > radius) {
       placeStates[p.name].inside = false;
     }
   });
-}
 
+  // ❗ بعد أول فحص
+  firstLocationCheck = false;
+}
 
 
 
@@ -617,39 +632,33 @@ function renderPlacesList() {
 
 /* ================== INIT ================== */
 function init(){
-  const langList = document.getElementById("langList");
-
-  LANGS.forEach(l => {
-    const b = document.createElement("button");
-    b.textContent = l.native;
-    b.onclick = () => {
-      state.lang = l.code;
-      localStorage.setItem("maalem_lang", l.code);
-
+  const langList=document.getElementById("langList");
+  LANGS.forEach(l=>{
+    const b=document.createElement("button");
+    b.textContent=l.native;
+    b.onclick=()=>{
+      state.lang=l.code;
+      localStorage.setItem("maalem_lang",l.code);
       document.querySelectorAll("#langList button")
-        .forEach(x => x.classList.remove("active"));
-
+        .forEach(x=>x.classList.remove("active"));
       b.classList.add("active");
-      document.getElementById("next1").disabled = false;
+      document.getElementById("next1").disabled=false;
       updateUI();
     };
     langList.appendChild(b);
   });
 
-  document.getElementById("next1").onclick = () => goTo(2);
-  document.getElementById("next2").onclick = () => goTo(3);
+  document.getElementById("next1").onclick=()=>goTo(2);
+  document.getElementById("next2").onclick=()=>goTo(3);
 
-  state.lang = localStorage.getItem("maalem_lang") || "ar";
+  state.lang=localStorage.getItem("maalem_lang")||"ar";
   updateUI();
 
-  // 🔓 مهم جدًا لـ iOS / Safari
-  document.body.addEventListener("click", () => {
-    try { speechSynthesis.resume(); } catch(e){}
-  }, { once: true });
-
+  // ✅ هنا
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw.js")
       .then(() => console.log("✅ Service Worker registered"))
       .catch(err => console.error("❌ SW error", err));
   }
 }
+
