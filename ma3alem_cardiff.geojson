@@ -33,8 +33,33 @@
         "Name": "Abacws Building",
         "Category": "Modern Landmark",
         "Story": {
-          "ar_long": "أنتِ الآن عند مبنى أبَكُس، موطن علوم الحاسب في جامعة كارديف. هنا تتلاقى البرمجة مع البحث العلمي، وتتحول الأفكار إلى تطبيقات وتقنيات حديثة. هذا المبنى يمثل الجيل الجديد من التعليم، حيث يُصنع المستقبل سطرًا سطرًا من الشيفرات.",
-          "en_long": "You are now at the Abacws Building, home to Computer Science at Cardiff University. This is where code meets research, and ideas evolve into modern applications and technologies. Abacws represents the new generation of learning, where the future is written line by line."
+"ar_long": "أنتِ الآن أمام مبنى أبَكُس، أحد أحدث معالم جامعة كارديف، حيث تلتقي علوم الحاسب مع الرياضيات في فضاء واحد نابض بالأفكار.  
+هنا، لا تُدرَّس البرمجة داخل قاعات تقليدية، بل تُمارَس كحرفة إبداعية، في بيئات صُممت لتعزيز التعاون والتفكير المشترك.  
+
+يمتد المبنى على ستة طوابق، ويحتضن مساحات تعليمية مرنة، وقاعات تدريس مبتكرة، ومختبرات حاسوبية تدعم العمل الجماعي والمشاريع الفردية على حد سواء.  
+في هذه القاعات، يعمل الطلبة جنبًا إلى جنب مع الأكاديميين، وتتحول الأفكار النظرية إلى نماذج أولية، وتجارب، وحلول تقنية حقيقية.  
+
+يضم أبَكُس مساحات مخصصة للمشاريع الطلابية، وورش تصنيع رقمي، ومختبرًا للأمن السيبراني، بالإضافة إلى غرفة تداول تحاكي بيئات الأسواق المالية، ما يعكس تنوع التخصصات التي يلتقي فيها العلم بالتطبيق العملي.  
+
+يقع المبنى على طريق سينغهينيد، بجوار محطة كاثيز للقطارات، في موقع كان يومًا ما موقفًا للسيارات، قبل أن يتحول إلى مركز تعليمي عالمي يُجسّد رؤية جامعة كارديف لمستقبل التعليم التعاوني.  
+
+في أبَكُس، لا يُكتب المستقبل على السبورة، بل يُبنى سطرًا سطرًا من الشيفرة."
+,
+          
+		  
+		  
+		  "en_long": "You are now standing at the Abacws Building, one of Cardiff University’s most modern landmarks, where Computer Science and Mathematics come together under one roof.  
+Here, learning goes beyond traditional lectures—coding becomes a creative practice, shaped by collaboration and shared discovery.  
+
+The six-storey building was designed in close partnership with students and academic staff, creating flexible teaching spaces, innovative lecture theatres, and interdisciplinary work environments that encourage interaction and experimentation.  
+
+Inside Abacws, students work across computer labs built for group collaboration, dedicated project spaces, makerspaces, and IT workshops that support hands-on computer science projects.  
+The building also houses a cybersecurity laboratory and a simulated trading room, reflecting the close connection between theoretical knowledge and real-world application.  
+
+Located on Senghennydd Road, next to Cathays railway station, Abacws stands on a site once used as a university car park—now transformed into a world-leading educational facility that represents Cardiff University’s vision for collaborative learning.  
+
+At Abacws, the future is not imagined—it is written, line by line, in code."
+
         },
         "TriggerType": "enter_radius",
         "RadiusMeters": 50
